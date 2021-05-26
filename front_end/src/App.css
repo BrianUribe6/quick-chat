@@ -1,0 +1,13 @@
+:root {
+    --primary-dark: #090809;
+    --primary-light: #3A3D3A;
+}
+
+/* body {
+    background-color: var(--primary-light);
+} */
+
+.bg-primary-dark {
+    background-color: var(--primary-dark);   
+}
+
