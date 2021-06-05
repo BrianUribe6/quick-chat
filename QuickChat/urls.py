@@ -28,5 +28,3 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path("", include('chat.urls'))
 ]
-
-print(urlpatterns)

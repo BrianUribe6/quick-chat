@@ -7,17 +7,17 @@ class ReactWebSocket extends React.Component {
             ws: new WebSocket(props.url),
             attempts: 1
         }
-        this.hasReconnect = props.reconnect; 
+        this.reconnect = props.reconnect; 
     }
     
     sendMessage(data) {
-        this.state.ws.send(data);
+        const msg = JSON.stringify(data);
+        this.state.ws.send(msg);
     }
 
     handleClose(e) {
         this.props.onClose(e);
-
-        if (!this.hasReconnect)
+        if (!this.reconnect)
             return;
         
         const attempts = this.state.attempts;
@@ -53,7 +53,7 @@ class ReactWebSocket extends React.Component {
     }
 
     componentWillUnmount() {
-        this.hasReconnect = false;
+        this.reconnect = false;
         this.state.ws.close();
     }
 

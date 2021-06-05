@@ -1,0 +1,13 @@
+.avatar-selector {
+    display: grid;
+    justify-items: center;
+    grid-template-areas: 
+    'avatar picker'
+    'sprite name';
+    row-gap: 1rem;
+}
+
+.avatar-preview-size {
+    height: 6rem;
+    width: auto;
+}
