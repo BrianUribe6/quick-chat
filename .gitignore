@@ -7,3 +7,4 @@ media
 .vscode
 root_files
 static
+.env
