@@ -23,15 +23,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
     
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
-        
+        self.group_name = f"group_{self.room_name}"
         await self.accept()
+        await self.channel_layer.group_add(self.group_name, self.channel_name)
         if not await self.isvalid_room():
             await self.close(ERROR_CONNECTION_REJECTED)
             return
         
-        self.group_name = f"group_{self.room_name}"
         self.online_users.setdefault(self.group_name, {})
-        await self.channel_layer.group_add(self.group_name, self.channel_name)
+        # send list of online users in this room
+        users = self.online_users[self.group_name]
+        user_list = [
+            {'username': username, **attributes} 
+            for username, attributes in users.items()
+        ]
+        await self.channel_layer.send(self.channel_name, {
+            'type': TYPE_GET_USERS,
+            'user_list': user_list,
+        })
 
 
     async def disconnect(self, code):
@@ -39,7 +48,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.group_name, self.channel_name
         )
 
-        users = self.online_users[self.group_name]
+        users = self.online_users.get(self.group_name, {})
         try:
             # remove all info related to this user
             username = self.user_channel[self.channel_name]
@@ -63,11 +72,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
             # only sent it the user who requested the full list
             await self.channel_layer.send(self.channel_name, response)
             return
-            
+
         if response['type'] == TYPE_JOIN and response['username'] in users:
             await self.close(ERROR_NAME_UNAVAILABLE)
             return
-
+        
+        # TODO close connection when the type is unknown or is missing.
         await self.channel_layer.group_send(self.group_name, response)
     
     
@@ -89,11 +99,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
 
     async def chat_get_users(self, event):
-        users = self.online_users[self.group_name]
-        event['user_list'] = [
-            {'username': username, **attributes} 
-            for username, attributes in users.items()
-        ]
         await self.send_json(event)
 
 

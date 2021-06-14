@@ -5,7 +5,7 @@ import {
 import "./App.css";
 import Room from './ChatRoom';
 import Lobby from './Lobby';
-
+import {ReactComponent as PageNotFound} from './assets/404.svg'
 
 
 function App() {
@@ -18,7 +18,7 @@ function App() {
         <Route exact path='/' component={Lobby} />
         <Route exact path='/r/:name' component={Room} />
         <Route>
-          <h1>Error 404: Page does not exist</h1>
+          <PageNotFound />
         </Route>
       </Switch>
     </>
